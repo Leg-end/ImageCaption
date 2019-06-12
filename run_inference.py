@@ -8,7 +8,7 @@ import os
 
 import tensorflow as tf
 import numpy as np
-from . import imc_model_cpu
+from . import imc_model
 from . import model_helper
 import codecs
 from .utils import misc_utils as utils
@@ -23,7 +23,7 @@ __all__ = ["get_model_creator", "start_sess_and_load_model",
 
 
 def get_model_creator():
-    return imc_model_cpu.BaseModel
+    return imc_model.BaseModel
 
 
 def start_sess_and_load_model(infer_model, ckpt_path):

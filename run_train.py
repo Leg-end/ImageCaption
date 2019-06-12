@@ -6,7 +6,8 @@ from __future__ import print_function
 
 import tensorflow as tf
 from . import model_helper
-from . import imc_model_cpu
+from . import imc_model
+from tensorflow.contrib import slim
 import os
 
 __all__ = ["get_model_creator",
@@ -15,7 +16,7 @@ __all__ = ["get_model_creator",
 
 def get_model_creator():
     """Get the right model class depending on configuration."""
-    return imc_model_cpu.BaseModel
+    return imc_model.BaseModel
 
 
 def train(hparams, scope=None):
@@ -59,7 +60,8 @@ def train(hparams, scope=None):
     saver = model.saver
     # Run training.
     print("Ready to train the model")
-    tf.contrib.slim.learning.train(
+    slim.fully_connected()
+    slim.learning.train(
         train_op,
         logdir=os.path.join(out_dir, "ckpt"),
         log_every_n_steps=hparams.steps_per_stats,
@@ -69,3 +71,5 @@ def train(hparams, scope=None):
         local_init_op=data_init_op,
         init_fn=pre_model_init_op,
         saver=saver)
+
+

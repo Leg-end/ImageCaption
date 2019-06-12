@@ -48,10 +48,10 @@ def get_initializer(init_op, seed=None, init_weight=None):
 
 def get_device_str(device_id, num_gpus):
     """Return a device string for multi-GPU setup."""
-    #if num_gpus == 0:
-    return "/cpu:0"  # changed cpu
-    #device_str_output = "/gpu:%d" % (device_id % num_gpus)
-    #return device_str_output
+    if num_gpus == 0:
+        return "/cpu:0"
+    device_str_output = "/gpu:%d" % (device_id % num_gpus)
+    return device_str_output
 
 
 class ExtraArgs(collections.namedtuple(
@@ -206,10 +206,10 @@ def process_image(image,
 
 
 def get_embed_device(vocab_size):#?
-    #if vocab_size > VOCAB_SIZE_THRESHOLD_CPU:
-    return "/cpu:0" #  changed cpu
-    #else:
-        #return "/gpu:0"
+    if vocab_size > VOCAB_SIZE_THRESHOLD_CPU:
+        return "/cpu:0"
+    else:
+        return "/gpu:0"
 
 
 # CNN model relative
@@ -359,7 +359,7 @@ def _single_cell(unit_type,
                  mode,
                  forget_bias=1.0,
                  state_is_tuple=False,
-                 device_str="/cpu:0"):
+                 device_str=None):
     """Create an instance of single RNN cell"""
     # dropout = (1 - keep_prob) is set to 0 during eval and infer
     dropout = dropout if mode == tf.contrib.learn.ModeKeys.TRAIN else 0.0
@@ -396,7 +396,7 @@ def _single_cell(unit_type,
 
     # Device Wrapper
     if device_str:
-        single_cell = tf.nn.rnn_cell.DeviceWrapper(single_cell, "/cpu:0") # changed device_str to cpu
+        single_cell = tf.nn.rnn_cell.DeviceWrapper(single_cell, device_str)
         print("    %s, device=%s" %
               (type(single_cell).__name__, device_str))
 

@@ -5,14 +5,16 @@ from __future__ import print_function
 import random
 import numpy as np
 import tensorflow as tf
+import os
 
 from . import run_train
 from . import run_inference
+from . import run_evaluate
 from .utils import misc_utils as utils
 from .utils import standard_hparams_utils
 
 
-def run_main(hparams, train_fn, infer_fn):
+def run_main(hparams, train_fn, infer_fn, eval_fn):
 
     # GPU device
     print(
@@ -52,6 +54,17 @@ def run_main(hparams, train_fn, infer_fn):
         infer_fn(hparams)
     elif mode == "train":
         train_fn(hparams)
+    elif mode == "eval":
+        eval_dir = hparams.eval_dir
+        if not utils.check_file_existence(eval_dir):
+            raise ValueError("Cannot find dir % s" % eval_dir)
+        filenames = tf.gfile.ListDirectory(eval_dir)
+        if len(filenames) == 0:
+            raise ValueError("Can not find source under dir %s", eval_dir)
+        for i in range(len(filenames)):
+            filenames[i] = os.path.join(eval_dir, filenames[i])
+            hparams.inference_inputs = filenames
+        eval_fn(hparams)
 
 
 def main():
@@ -82,12 +95,28 @@ def main():
             config_msg = ''.join(["mode:", mode, ", batch_size:",
                                   str(batch_size), ", train_steps:",
                                   str(train_steps)])
+        elif mode == "eval":
+            """min_eval_steps = int(input("Set min evaluate step(default 500):"))
+            if not min_eval_steps:
+                min_eval_steps = 500
+            eval_interval_secs = int(input("Set Interval seconds between two evaluation run(default=60):"))
+            if not eval_interval_secs:
+                eval_interval_secs = 60
+            hparams.min_global_step = min_eval_steps
+            hparams.eval_interval_secs = eval_interval_secs
+            config_msg = ''.join(["mode:", mode, ", start_eval_steps:",
+                                  str(min_eval_steps), ", interval_secs:",
+                                  str(eval_interval_secs)])"""
+            eval_dir = "D:/dataset/image_caption/val2014/"
+            config_msg = ''.join(["eval_dir:", eval_dir])
+            hparams.eval_dir = eval_dir
         else:
             raise ValueError("Unrecognized value %s " % mode)
         print(config_msg)
         train_fn = run_train.train
         infer_fn = run_inference.infer
-        run_main(hparams, train_fn, infer_fn)
+        eval_fn = run_evaluate.evaluate
+        run_main(hparams, train_fn, infer_fn, eval_fn)
         quit_sig = input("Quit or Continue?(Quit:q, Continue:c)")
         if quit_sig == "q":
             break
