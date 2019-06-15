@@ -6,3 +6,9 @@ The program structure is base on Tensorflow's 'nmt'https://github.com/tensorflow
 MCOCO 2014
 # Pre-trained model
 Google inception-v3
+
+# Environment
+tensorflow-gpu: 1.9.0
+CUDA: 9.0.176
+CUDNN: 7.3.0
+GPU: Nvida RTX-2070
