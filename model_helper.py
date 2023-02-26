@@ -241,7 +241,7 @@ def _create_pretrained_emb_from_txt(vocab_file,
                                     scope=None):
     print("debug")
     vocab, _ = vocab_utils.load_vocab(vocab_file)
-    trainable_tokens = vocab[:num_trainable_tokens]
+    trainable_tokens = vocab[:num_trainable_tokens]  # adding unk, start and stop are trainable
 
     print("# Using pretrained embedding: %s." % embed_file)
     print("  with trainable tokens: ")
@@ -260,7 +260,7 @@ def _create_pretrained_emb_from_txt(vocab_file,
         with tf.device(get_embed_device(num_trainable_tokens)):
             emb_mat_var = tf.get_variable(
                 "emb_mat_var", [num_trainable_tokens, emb_size])
-    return tf.concat([emb_mat_var, emb_mat_const], 0)
+    return tf.concat([emb_mat_var, emb_mat_const], 0)  # concat pretrained embbed vectors with 3 new trainable vectors
 
 
 def create_or_load_embed(embed_name, vocab_file,
